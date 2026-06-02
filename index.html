@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Y3 · B3 AI Acceleration — Workshop-syntes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#DF668A; --teal:#0CCCCC; --blue:#426DA9; --yellow:#EFBD47;
+    --green:#2ECC71; --red:#E74C3C;
+    --ink:#1d2330; --muted:#6b7280; --line:#e7e9ef; --bg:#f5f6f9; --card:#ffffff;
+    --plat:#426DA9; --plat-bg:#eef3fa;
+    --enab:#1aa179; --enab-bg:#e9f7f0;
+    --comm:#c9931f; --comm-bg:#fdf6e6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Work Sans',system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.45}
+  a{color:inherit}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 22px}
+
+  /* Header */
+  header{background:#fff;border-bottom:3px solid var(--pink)}
+  .head{display:flex;align-items:center;gap:18px;padding:18px 0}
+  .logo{font-weight:800;font-size:30px;letter-spacing:-1px;color:var(--ink);line-height:1}
+  .logo span{color:var(--pink)}
+  .tag{font-size:10px;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin-top:2px}
+  .htitle{margin-left:6px;border-left:1px solid var(--line);padding-left:18px}
+  .htitle h1{margin:0;font-size:19px;font-weight:700}
+  .htitle p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+
+  /* KPI strip */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:20px 0}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi .num{font-size:26px;font-weight:800;line-height:1}
+  .kpi .lab{font-size:11.5px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.3px}
+  .kpi.p .num{color:var(--plat)} .kpi.e .num{color:var(--enab)} .kpi.c .num{color:var(--comm)}
+
+  /* Controls */
+  .controls{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 0;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+  .tabs{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .tabs button{border:0;background:#fff;padding:9px 16px;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer}
+  .tabs button.active{background:var(--pink);color:#fff}
+  .search{flex:1;min-width:200px}
+  .search input{width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:13.5px}
+  .secfilter{display:flex;gap:6px}
+  .chipf{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
+  .chipf.on.p{background:var(--plat-bg);color:var(--plat);border-color:var(--plat)}
+  .chipf.on.e{background:var(--enab-bg);color:var(--enab);border-color:var(--enab)}
+  .chipf.on.c{background:var(--comm-bg);color:var(--comm);border-color:var(--comm)}
+
+  main{padding:22px 0 60px}
+
+  /* Cluster grid */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .cl{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .cl-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;background:linear-gradient(90deg,#fff,#fff)}
+  .cl-h:hover{background:#fcfcfd}
+  .cl-h .badge{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:var(--pink);color:#fff;font-weight:800;font-size:15px;margin-right:11px}
+  .cl-h h3{margin:0;font-size:15.5px;font-weight:700}
+  .cl-h .city{font-size:12px;color:var(--muted);margin-top:1px}
+  .cl-h .cnt{font-size:11px;color:var(--muted);font-weight:600}
+  .cl-body{padding:0 18px 8px}
+  .sec{margin:14px 0}
+  .sec-h{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:7px 10px;border-radius:8px}
+  .sec.p .sec-h{background:var(--plat-bg);color:var(--plat)}
+  .sec.e .sec-h{background:var(--enab-bg);color:var(--enab)}
+  .sec.c .sec-h{background:var(--comm-bg);color:var(--comm)}
+  .qgroup{margin:9px 0 4px}
+  .qlab{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin:8px 0 5px}
+  .notes{display:flex;flex-wrap:wrap;gap:6px}
+  .note{font-size:12px;background:#f3f4f8;border:1px solid #e7e9ef;border-radius:7px;padding:5px 9px;max-width:100%}
+  .sec.p .note{background:var(--plat-bg);border-color:#dbe6f4}
+  .sec.e .note{background:var(--enab-bg);border-color:#cdeede}
+  .sec.c .note{background:var(--comm-bg);border-color:#f4e6bf}
+  .note.hit{outline:2px solid var(--yellow)}
+  .collapsed .cl-body{display:none}
+  .chev{transition:transform .2s;color:var(--muted);font-size:13px}
+  .collapsed .chev{transform:rotate(-90deg)}
+
+  /* Theme view */
+  .themes{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .th{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;border-top:4px solid var(--pink)}
+  .th h3{margin:0 0 4px;font-size:16px;font-weight:700}
+  .th .rank{font-size:11px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.4px}
+  .th p{margin:8px 0 12px;font-size:13px;color:#333}
+  .th .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .heat{display:flex;gap:3px}
+  .dot{width:15px;height:15px;border-radius:4px;background:#e7e9ef;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .dot.on{background:var(--pink)}
+  .th .sub{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin:6px 0}
+  .th .ex{font-size:12px;color:#444;background:#f7f8fb;border-radius:7px;padding:6px 9px;margin:5px 0;border-left:3px solid var(--teal)}
+
+  /* Synthesis */
+  .syn{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .panel.full{grid-column:1/-1}
+  .panel h2{margin:0 0 4px;font-size:18px}
+  .panel .lead{color:var(--muted);font-size:13px;margin:0 0 14px}
+  .ins{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+  .ins:first-of-type{border-top:0}
+  .ins .ico{flex:0 0 34px;height:34px;border-radius:9px;background:var(--pink);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .ins .ico.t{background:var(--teal)} .ins .ico.b{background:var(--blue)} .ins .ico.y{background:var(--yellow)} .ins .ico.g{background:var(--green)}
+  .ins h4{margin:0 0 3px;font-size:14px}
+  .ins p{margin:0;font-size:12.5px;color:#444}
+  .reco{font-size:13.5px;margin:10px 0;padding-left:26px;position:relative}
+  .reco:before{content:"▸";position:absolute;left:4px;color:var(--pink);font-weight:800}
+  .tension{background:var(--comm-bg);border:1px solid #f4e6bf;border-radius:10px;padding:12px 14px;margin-top:8px;font-size:13px}
+  footer{font-size:11.5px;color:var(--muted);padding:18px 0 40px;text-align:center}
+  .hidden{display:none!important}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid,.themes,.syn{grid-template-columns:1fr}.head{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap head">
+    <div>
+      <div class="logo">b<span>3</span></div>
+      <div class="tag">Creating possibilities together</div>
+    </div>
+    <div class="htitle">
+      <h1>Y3 · B3 AI Acceleration — Workshop-syntes</h1>
+      <p>Övning: Bygg vår gemensamma backlog för spåren · 10 kluster · 50 min · sammanställning av samtliga lappar</p>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="kpis">
+    <div class="kpi"><div class="num">10</div><div class="lab">Kluster</div></div>
+    <div class="kpi"><div class="num" id="kNotes">0</div><div class="lab">Lappar totalt</div></div>
+    <div class="kpi p"><div class="num" id="kPlat">0</div><div class="lab">Platform &amp; Deliver</div></div>
+    <div class="kpi e"><div class="num" id="kEnab">0</div><div class="lab">Enable / Skilling</div></div>
+    <div class="kpi c"><div class="num" id="kComm">0</div><div class="lab">Commitments</div></div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="wrap" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;width:100%">
+    <div class="tabs">
+      <button data-view="syn" class="active">Syntes</button>
+      <button data-view="cluster">Klustervy</button>
+      <button data-view="theme">Temavy</button>
+    </div>
+    <div class="search"><input id="q" type="text" placeholder="Sök i alla lappar (t.ex. Cinode, governance, certifiering, CV-matchning)…"></div>
+    <div class="secfilter" id="secfilter">
+      <span class="chipf on p" data-sec="platform">Platform</span>
+      <span class="chipf on e" data-sec="enable">Enable</span>
+      <span class="chipf on c" data-sec="commit">Commit</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section id="view-syn"></section>
+  <section id="view-cluster" class="hidden"></section>
+  <section id="view-theme" class="hidden"></section>
+</main>
+
+<footer class="wrap">Sammanställt från workshop-board (Mural-export, PDF). Lappar har tolkats och städats; namn och formuleringar återges så troget källan tillåter.</footer>
+
+<script>
+const CL = [
+ {n:1, city:"Malmö · Loungen",
+  platform:{
+   nu:["Avtalshantering & granskning av avtal","Månadsrapport-GPT","Claude för CV-generering mot uppdrag","VD-rapporteringsverktyg","LIA-student byggt AI-agent i intranät (RAG mot handbok/policy)","GPT:er för rekrytering, offert, kommunikation","Virtuell motpart (t.ex. svåra samtal)","Kandidatintervju-förberedelse","Intern AI-workshop & hackaton för hela bolaget","Individuella prompter/arbetsflöden i kunduppdrag — ad hoc, personberoende"],
+   be:["Svårt veta vad kollegor/B3-bolag redan testat — kunskap fastnar hos individer","Svårt ta hackaton vidare till något konkret","Effektivisering av arbetet!"],
+   ab:["Testa & ge feedback på gemensam plattform om en byggs","Kunskap om vad som funkar i praktiken för ledare med ChatGPT/Claude","Bidra med utvecklarperspektiv på vad plattformen behöver stödja",{t:`Bidra med utvecklare mellan uppdrag (PoC, bygga plattformen)`,n:1},{t:`Minst 1 AI-champion`,n:1},{t:`Referensbolag`,n:1}]},
+  enable:{
+   nu:["Lunch & Learns","ChatGPT Enterprise/Team, GitHub Copilot (vissa), Microsoft Copilot (begränsat), Shadow AI","Många använder ChatGPT privat (kunddialog, offert, krav, dok, research, kodgranskning) — mer än formaliserat","Informella lunchdemos internt","B3 Arena Malmö — AI som ämne med externa talare & kunder",{t:`Effektivisera interna ekonomiprocesser: selfbilling-fakturering, tidredovisning, påminnelser/avvikelser`,n:1}],
+   be:["Ingen strukturerad utbildningsplan","Vilka certifikat/utbildningar bör man göra som konsult / ledare / champion","Behov: Copilot, Azure AI, OpenAI, AI för ledare, Prompt engineering, Governance & säkerhet","Praktiska workshops, inte bara teori (”visa hur jag använder det i mitt uppdrag”)",{t:`Vilka verktyg jobbar vi med i koncernen? Gemensam verktygslicens = ”B3 standardmiljö”`,n:1},{t:`Kompetensutveckling`,n:1}],
+   ab:["Erfarenheter från AI i egna utvecklings-/dataprojekt","Nominera de mest aktiva som AI Champion","Hålla ”visa hur jag jobbar med AI”-sessioner internt",{t:`Via våra bänkare`,n:1},{t:`Lista: utbildningar utvecklare redan gått`,n:1},{t:`Champions: Sebastian Nirfelt, Linus Chaeder`,n:1}]},
+  commit:["1 Champion + bidra governance-struktur",{t:`Hanna: börja med Claude`,n:1},{t:`Hanna: granska om FD:s Claude–Cinode-integration passar`,n:1},{t:`Fredrik: överför ChatGPT-historiken till Claude`,n:1},{t:`Utvecklare från bänk in i programmet`,n:1},{t:`Pernilla/Patrik · Fredrik/Patrik`,n:1}]},
+
+ {n:2, city:"Stockholm · Malala",
+  platform:{
+   nu:["Gemensam ChatGPT & Claude Team (gratis)","Personliga tester med Obsidian-vault","Kundresearch-prompt/projekt","CV- & kravmotiverings-projekt i Claude","Cinode MCP, 365 MCP m.m. i Claude & ChatGPT","Skapar PPT/Excel m.m. med Claude","Projekt: Strategicoach till bolaget","Prospekteringsskill för kundkontakter","PO-coach","Påbörjat agent i Copilot Studio (ej vidare)","Månadsbokslutsanalys i Copilot","Calles Skandia-uppdrag: Copilot-agenter i reglerad miljö"],
+   be:["Oklart vilka verktyg vi ”får” internt","Säkerhetsperspektivet (säkerhet, kunddata)","Tid! pga projekten","Ingen tydlig väg från ”jag testar själv” till ”vi erbjuder detta som tjänst”","Saknar gemensamma licenser & riktlinjer","Vad skiljer corp-GPT, Claude, CoPilot Studio?","Fler konsulter med AI-profil"],
+   ab:["Kunduppdrag att nyttja: internt B3, liknande kunder, mentorskap över bolagen","Via Insight-uppdraget driva AI i uppföljning/flödet","Mkt bra case i flödet — vi kan dela","Storsala kommit långt med bred AI-etablering"],
+   bidr:["Gärna pilotbolag för det mesta, särskilt Office","Bidra med utvecklare mellan uppdrag (PoC, bygga plattform)","Minst 1 AI-champion","Mkt sälj- & erbjudandematerial","Konsulter inom compliance på sikt"]},
+  enable:{
+   nu:["AI Show & tell-sessioner","Egen gemensam tips & trix-kanal / kunskapsdelning från vardagen","AI-teman på bolagsaktiviteter"],
+   be:["AI-kompetenstrappa gemensam för B3 (0–5 steg)","”AI klivet 2026” — strukturerat kompetensprogram varannan vecka","”AI-ready”-paket på koncernnivå — konkret kurs/cert (”B3 AI Certified lvl 1”) riktad till utvecklare","Shortlist med certifikat för 1) ledare 2) konsult 3) supportfunktioner","Stöd att identifiera AI-möjligheter i pågående uppdrag","Certifiera oss som ledare"],
+   ab:["Kompetenskarta: starkast utvecklare/arkitekter/tekniska ledare; svagast sälj/rekrytering/chefer/affärsutveckling","Potential stor utanför utvecklingsorg. — men svårt för icke-utvecklare att hitta tiden","Konceptet med AI-klivet kan återanvändas"]},
+  commit:["TK — Sätta roadmap AI för B3","JR — Claude fundamentals","PS — GTM Insight","AB — Vidareutveckla Claude PPT-lösning för kunduppdrag","KNH — Klar med AI-stöd för Bid","1 Champion + governance-struktur",{t:`TK — Council och bidrar till`,n:1},{t:`JR — Vidareutveckla`,n:1},{t:`AB — Återkommer`,n:1},{t:`AI-driven säljprocess`,n:1}]},
+
+ {n:3, city:"Stockholm · Frida Kahlo",
+  platform:{
+   nu:["Enskilda insatser (ad hoc)","Testmatchning & automatiserat flöde för rekryteringskandidater","”Projekt”/Claude ”Konsultchefen”","Claude Cowork-flöde: transkribering, renskrivning, kategorisering, presentation + script & assets","Stöd för förvaltningsavtal / anbud / säljmöten","End-to-end AI-chatbot (demo, försäkring; Azure AI-Factory, Power Pages, BC)","Claude Code vid utveckling","Script för BC-lösning; kvalitetssäkrar filer lokalt","Aktiv AI mot kund (sälj & leverans)","Jämfört anbud (beställarstöd)"],
+   be:["Ingen gemensam plattform/policy — olika långt","Många konsulter begränsade av kundens policy","Saknar compliance-kompetens","Trötta stödsystem","Ingen tillgång till alla smarta Cinode-MCP/DB","Behov av gemensam yta / källor / dokument","Fler vassa tekniska AI-arkitekter"],
+   ab:["Enkel delning (projekt, skills)","Best practice finns men inte paketerat","Enkät för AI-mognad hos kunder","AI-agent ”Försäkring” kan kompetensdelas","Pilotbolag för Claude Enterprise"],
+   bidr:["Främst driva affären/erbjudande med andra bolag","Fortsätta i Sales flow","Erbjuda även ChatGPT Business?","”Vi vill vara med i allt :)”"]},
+  enable:{
+   nu:["Mission Copilot","Använder AI enskilt för att lära","Playbook med AI-stöd-exempel i projektleveranser","Cert hos MS & Anthropic; MS AI-cert i beta (svar dröjer 8 v.)","AI-labbar"],
+   be:["Vilka certifikat/utbildningar ska man göra","Att koncernen totalt har tillräckligt många"],
+   ab:["Dela AI-erfarenheter i kluster (konferens)","Delning inom koncern/bolag","Format från Vår-konf kan delas","Plattformsperspektiv: Carl Stålhem, Johan Rizkallah, Livan, Jimmy, Henrik (Claude Code)"]},
+  commit:["TK — Council, bidrar till","KNH — Bid-lösning forts., Sales Flow enabler","PS — GTM Platform via Insight","JR — Vidareutveckla","1 Champion + governance",{t:`Etablera forum för koncern / kluster-grupperna i vardagen`,n:1},{t:`Sätta upp grundstruktur & etablera plattform i koncernen`,n:1},{t:`Skapa kanal för att dela inspo / återanvändbara instruktioner`,n:1},{t:`Tydliggöra format och odla motivation`,n:1},{t:`Röja blockers — teknik och avsätta tid`,n:1},{t:`Påverka strategin för B3 — hur B3 kan öka takten`,n:1},{t:`Hitta former att inspirera och utmana`,n:1},{t:`Stöd i sälj och tidiga faser hos kunder (intervjuer, förstudier, beslutsunderlag)`,n:1},{t:`Skaffa ChatGPT AddIn / Business-versioner`,n:1},{t:`Skapa fler integrationer · mera ”Projekt”`,n:1}]},
+
+ {n:4, city:"Göteborg · Radia Perlman",
+  platform:{
+   nu:["B3 Cloud: Salesflow, CV-coach, flera Skills, batchkörningar, vektordatabas","B3 Cloud: Ekonomi-agent, HR-agent, chatbot för kund, multiagentsystem, BC-chatbot, lokala modeller, realtime voice","B3 Cloud: MCP (Cinode + ärendehantering/BC), inner sourcing, ”SME”-agenter","B3 Zenith: Claude-skills för CV-matchning mot kravspec","B3 Zenith: LinkedIn-innehåll (tonalitet, erbjudande, insikter, kundmöten)","Case-study & referens-generator","AI-förhandlingsrobot mot leverantörer; AI-forecasting; kvitto-kategorisering","Automatisering av processer; MCP mot Bolagskompassen/AI-kompassen/Cinode","Ekonomi-coach; Offert/Custom-GPT:er; AI-presentationsmallar"],
+   be:["Otydligt med policy / vad man får göra","Tokenbegränsning & token-ekonomi","Ej gemensamma workspaces för projekt hos kund","Avsaknad gemensamt beslutat arbetssätt","Kundens policy hänger inte med (vad ska bolaget reglera?)","Vilken LLM/version är bäst?","Kunderna är inte där; legala hinder","Väldigt olika kunskapsnivå","Behov: ökad kunskap, tid, strategi/central styrning","Ramar: insikt/urgency · teknik/licenser · policy/best practice/struktur"],
+   ab:["Gjort Governance-ramverk","AI Community idag (AI Forge) — många bolag bidrar","Test-tenant för Copilot Studio & Foundry","CV-coach/Salesflow delas idag — i grunden kan allt delas"],
+   bidr:["Äga governance","Pilotbolag för Claude Enterprise","Förfrågningsmatchning","Case-study/referens-generator; MCP mot kompasserna/Cinode"]},
+  enable:{
+   nu:["B3 Cloud: Learning by doing, gemensamma vibe-coding-event, up-skilling 2 ggr/v","B3 Cloud: AI Community, Prompt engineering-utb, L&L, mini-hackaton, Copilot Studio-utb för kund","Ledningen jobbar dagligen med anbudsgeneratorn"],
+   be:["Vilka certifikat/utbildningar ska man göra","AI-certifieringar (DP600, Anthropic)","Ta fram AI-koncept","Kostnad för AI-verktyg"],
+   ab:["Hands-on konkreta exempel; Learning by example; WoW-delning","Bidrag: lunch-learn, månadsmöten, externa presentationer","Interna prompting-utbildningar","Framtagna AI-labbar & AI-koncept","Namn x som Champion"]},
+  commit:["Få förståelse & fånga bra exempel","Jens: dela med kollegor","Jens: committa lära en ny sak/vecka & tillämpa","Jens: starta bi-weekly AI-möte (NW, kunskapsdelning)","Skapa LinkedIn-serie kring AI/Analytics-koncept","Lägga mer tid på Claude","”Vi ligger så långt efter så vi kan nog inte bidra”","1 Champion + governance",{t:`Niclas: prata med mina konsulter om deras AI-kompetens & utveckling framåt`,n:1},{t:`Niclas: stöttar och utvecklar`,n:1},{t:`Jens: kan vara testpiloter och delaktiga i projekt`,n:1}]},
+
+ {n:5, city:"Stockholm · Teamrummet",
+  platform:{
+   nu:["Utvärderat & använt enterprise-versioner av Claude & ChatGPT","Byggt ”zebrabot” (kopplat mot bl.a. inköp)","Copilot mot O365","”Talk to your data” mot ekonomisk uppföljning","Räknesnurra för recoup-tid","MCP mot Maconomy & Cinode","CustomGPT för DORA-efterlevnad & ekonomirapportering","Lyckade integrationer mot produktionsverktyg"],
+   be:["Governance ej färdigt","Pengar/budget (ekonomiavdelning)","Regelverk — men öppning finns","Otydlighet kring licenser","Kunders begränsningar; SUA & kundens dator","Rädsla att läcka information; tillitsproblem","Behöver prioritera tid & utbildning","GDPR-hänsyn"],
+   ab:["Automatisering av interna processer","Konfigurationer/MCP (ex Cinode)","Säkerhets-audit för regulatoriska krav (GDPR, AI Act) — kan enkelt återanvändas","Mognadsanalys AI-compliance","Kan kopplas till kunderbjudande"],
+   bidr:["Utse AI-champion; rådgivning","Josefin gärna ”försökskanin” & engagerad","Hjälper gärna till utvärdera, piloter","Alla vill engagera sig","B3 Zenith: effektivisering inom ekonomiavdelningen"]},
+  enable:{
+   nu:["B3 Cloud: Utbildningar; erbjudit AI-utb av olika verktyg (även projekt)","Löpande kompetensdelning internt"],
+   be:["Microsoft cert / Claude cert","Hitta fler områden, lära mer, gärna cert","Väldigt varierande behov — individuellt i bolagen","Omvärldsbevakning; B3 standardbetyg","Utbildning i att prompta; Finance-relaterade; generella kurser hos Google"],
+   ab:["AI-leader-kurs","Gemensamma certifieringar & arbetsgrupper","CV-coach","Per Wallenhed (upphandling) utsedd","Pool: Max Wikström, Christian Lauritzen, Göran Andersson, Per Kroon (AI/Data); Miguel Fürst, Simon Karlsson, Tomas Stene, Karol Sek, Maximilian Blomqvist, Markus Lykonhold, Jimmy Beckman","Prompt-engineering-föreläsningar (Calle Lejdbrandt, Johan Löfblad, Robert, Eva Hegnar, Ali Aghelmaleki); Python/AI (Christoffer Killander, Fredrik Abbors, Dennis, Emma)",{t:`Tillkomna: Steffo Dimfelt, Tomas Lindell (DORA), Göran Andersson (föreläsning), Josefine Carlsson (ekonomi), Rudin (Prompt engineering), Calle Lejdbrandt (RAG)`,n:1}]},
+  commit:["Strategiskt bollplank","AI-leveranser","Utbildningar / Säljstöd","Testgrupp/målgrupp","Diskutera effektiviseringspotential inom Finance","1 Champion + governance",{t:`Färdigställer B3:s riktlinje för AI-användning`,n:1},{t:`Audit för efterlevnad GDPR och AI Act (Gunnar)`,n:1},{t:`Roadmap & mognadsanalys (Gunnar)`,n:1},{t:`Paketering compliance · Council`,n:1},{t:`Copilot-GPT för säk-analys av osäker mail`,n:1},{t:`Skapar många nya skills i Copilot · skapa fler integrationer`,n:1},{t:`AI-erfarenheter kommer in i CV:n`,n:1},{t:`Gör klart frånvaroapp`,n:1},{t:`Ställer gärna upp och testar & ger feedback`,n:1},{t:`Bidra brett med tid och engagemang · ständigt ligga på konsulterna`,n:1},{t:`Sprida erfarenheter & case mellan bolagen`,n:1},{t:`Kenneth: starta upp Google Cloud Generative AI Leader-cert`,n:1},{t:`MS-plattform (Foundry/Copilot)`,n:1},{t:`Namn: Gunnar, Daniel, Joakim, Magnus, JC, Johan, Johan L, Chris`,n:1}]},
+
+ {n:6, city:"Stockholm · Rosa Parks",
+  platform:{
+   nu:["Gemensam ChatGPT Team","Projekt i Claude","LinkedIn-strategi via AI för post","Byggt en anbudsgenerator","Tydlig prompt för CV-matchning"],
+   be:["Okunskap i hur man bygger","Otydligt med policy / vad man får göra","Fastnar tekniskt"],
+   ab:["Gjort Governance-ramverk","Pilotbolag för Claude Enterprise"],
+   bidr:["Bidra med resurser","Skapa framåtlutande rekryteringsannonser"]},
+  enable:{
+   nu:["Blogg-serie på R&Bs hemsida","AI-labb en gång/vecka","Bjudit in AI-profil till månadsmöte","learnifyer"],
+   be:["1–2 månadsmöten med inspiration av en konsult","Vilka certifikat/utbildningar","Externa kurser som intern utbildning"],
+   ab:["Henry Wang","Namn x som Champion",{t:`Full fokus på AI i Y3 framåt`,n:1},{t:`Riktning — lyfta alla en nivå upp, sålla bort irrelevant`,n:1},{t:`Learnifyer — lättillgängligt; intern utbildning`,n:1},{t:`Namn: Anders Pettersson, DBAce, Miguel Furst, Per Wallenhed (upphandling)`,n:1}]},
+  commit:["Ta kontakt med X som AI-champion","1 Champion + governance",{t:`Emma: hitta ett sätt att dela projekt`,n:1},{t:`Emma: komma vidare med Microsofts erbjudanden`,n:1},{t:`Anordna ”AI-stuga” för B3 Health med hands-on-fokus`,n:1},{t:`Börjar använda Claude för bättre konsultofferter`,n:1},{t:`Presenterar vår AI-agent (Zebran) för Copilot`,n:1},{t:`Som referensgrupp med konkreta case från kunder`,n:1},{t:`Köper Claude (Magnus) · träna & utbilda mig, testa fler agenter`,n:1},{t:`Namn: Anders, Janne`,n:1}]},
+
+ {n:7, city:"Stockholm · Tarana Burke",
+  platform:{
+   nu:["Infographics & summering med ChatGPT (t.ex. riskworkshop)","Byggt matchningsagent (prompt för två profiler)","Transkribering med Klang.ai; mötestranskriberings-prompt","Mappstruktur för olika typer av agenter","Claude för PowerPoint-bilder"],
+   be:["Återanvändbarhet","Enterprise-licenser","Okunskap om vad man kan göra","Riktlinjer från koncernen","Handfast ”how to” för agenter"],
+   ab:["Bidra med idéer kopplat till inköp/upphandling","Frukostmöten/events mot bank & försäkring","Utbildningar i prompting; kravställning agenter","Sälja mot bank & försäkring","Pilotbolag — vara med och testa"]},
+  enable:{
+   nu:["Köper in utbildning för hela bolaget — AI för projektledare (NFI)","Konsultmöten: dela exempel"],
+   be:["Någon certifiering ”den ska alla göra” — även utanför B3","AI för förändringsledare","Onboarding — säk-utb + AI-utb + påminnelse inom 1 mån","NFI-utb"],
+   ab:["Transkriberingsagent — mötessummeringar","Matchningsprompt","Utbildning hur man transkriberar","Urban Ottosson; Lars Westerblom"]},
+  commit:["Agent för upphandling (dokument & transkribering)","Ta del av Susannes prompt för matchning","AI-förändringsledning","Dela — verktyg: ChatGPT, Claude, Sora, Copilot, Genisys; tidigare avtal/policy, mötesbokningsapp, kopplat Claude med ppt/excel/word",{t:`Kravställa AI-utbildning och bjuda in`,n:1},{t:`Dela Annas process & prompt för transkribering`,n:1},{t:`Alla laddar ner Klang.ai och skapar konto`,n:1},{t:`Pilotgrupp — möten och summering/noteringar`,n:1},{t:`Dela behov av AI-verktyg i projektvardagen`,n:1},{t:`Visab/FC`,n:1}]},
+
+ {n:8, city:"Sundsvall",
+  platform:{
+   nu:["CV-matchning i ChatGPT med egen GPT","Kopplat Claude till Office-program","Claude till Sales- & Leads-lådorna","Gemensam ChatGPT Team","MCP för att prata med Cinode","Rekryteringshjälp — ChatGPT-prompt","Chatgpt-projekt för att matcha konsulter",{t:`Koncerngemensamma skillset & md-filer`,n:1},{t:`Custom GPT:er för kundens handböcker (projekt-/förvaltningsmodeller)`,n:1}],
+   be:["Otydligt med policy / vad man får göra","Utkast till behandlingsriktlinjer","LinkedIn-inlägg via ChatGPT","Tid är en faktor; omvärldskoll","Riskanalyser; säljstatistik","Vill ha: enhetlighet, kvalitetssäkrat, prioritering, erbjudande från B3 om AI-agenter"],
+   ab:["Gjort Governance-ramverk","Pilotbolag för Claude Enterprise"]},
+  enable:{
+   nu:["Genomfört kompetenskartläggning i bolaget","Promptbibliotek med tillhörande GPT/agent","Jobbar aktivt med CV för alla typer av roller","Generell uppmaning & uppmuntran"],
+   be:["Back to basics: hur promptar man bra","Vilka certifikat/utbildningar","Har AI-lead(s)","Årshjul med utbildningar konsulter kan planera","Studiecirkel; säljstrategier"],
+   ab:["Prompta som ett proffs (utbildning)","Jonas Eklöf, Jan Welmer, Nicole Petovello, Zelimir Lindholm, Anna AH, Andreas Eklund","Namn x som Champion",{t:`Siktar på minst en från varje ”kompetensgren” inom Vibe`,n:1},{t:`Tillkomna: Zara Lundgren, Hans Danielsson`,n:1}]},
+  commit:["Ta kontakt med X som AI-champion","1 Champion + governance",{t:`Förfina CLAUDE.md · storstäda bland Claude-projekt`,n:1},{t:`Inventera Learnifyer · be kollega om Claude-course`,n:1},{t:`Se till att vi utbildar i hur man kopplar ihop AI-verktyg`,n:1},{t:`Effektivisera tråkiga saker i uppdraget och dela med andra`,n:1},{t:`Bidra med att effektivisera interna säljprocesser`,n:1},{t:`Skaffa licens för Claude (Jenny)`,n:1},{t:`Driva konsulter som vill vara med`,n:1},{t:`Forsätta certifieringsspåret mot CCA-F (Jonas)`,n:1},{t:`Cinode-MCP-server (Jonas)`,n:1},{t:`Claude istället för ChatGPT (Rickard) · rätt skills set`,n:1},{t:`Börja bygga agenter`,n:1},{t:`Namn: Ola, Rickard, Jonas, Pernilla, Hans, Kattis`,n:1}]},
+
+ {n:9, city:"Linköping",
+  platform:{
+   nu:["Koncerngemensamma skillset & md-filer","Claude skapar nya versioner/regler","ChatGPT Enterprise; CoPilot/Claude Enterprise","AI-assisterad utveckling","MCP mot Maconomy & Cinode för FOU-underlag","Custom GPT:er; säkerhetsskydd"],
+   be:["Otydligt med policy / vad man får göra","Tröskel att byta AI","För lite utbyte mellan medarbetare","Tid; omogna i uppdrag","DPO; dyrt","”Det är bara inte så enkelt”"],
+   ab:["Gjort Governance-ramverk","Pilotbolag för Claude Enterprise","Underlag till FoU-avdrag","Återanvända texter till upphandlingar","Säljcoach; matchning; CV- & kravmatchning (på gång i Salesflow)","Visa upp saker vi gjort"]},
+  enable:{
+   nu:["Azure AI engineer","AI-labb en gång/vecka","Internt show & tell; AI talks","Började basic — gått hela vägen till hackaton"],
+   be:["Anthropic certifieringar; cert","Vilka certifikat/utbildningar","Färdiga AI-learning paths för nyanställda","Med i studiecirkel för certifieringar"],
+   ab:["Zara Pettersson (Commit), Janne Aho, Emil Neander (Commit)","Föreläsningar","Namn x som Champion"]},
+  commit:["Ta kontakt med X som AI-champion","1 Champion + governance",{t:`Anders: sätta upp AI-council / forum för ledning`,n:1},{t:`Anders: lyfta blicken till det externa, fokus på kunderna`,n:1},{t:`Calle: sätta agenda för kick-off · ska lära sig allt`,n:1},{t:`Ola: våga ge / få grunder · dela erfarenheter`,n:1},{t:`Eva: bidra i Salesflow`,n:1},{t:`Claes: sätta [struktur]`,n:1},{t:`Åza: boka möte med kollega`,n:1},{t:`Claude kontroll över mailboxen · Claude istället för ChatGPT`,n:1},{t:`Effektivisera upphandlingsarbetet`,n:1},{t:`Kick-off: sätta sig in i AI-assisterad utveckling — i Västerås, Örebro, Linköping`,n:1}]},
+
+ {n:10, city:"Stockholm · ej namngivet (R&B / B3 Now)",
+  platform:{
+   nu:["OpenAI, Claude, Grok, Mistral, Gemini, ServiceNow","AI-sekreterare","CV-konverterare","RFx Skills; B3 Now AI Consultant (Echelon idag); RFx support",{t:`AI-sekreterare som bevakar mail, board & Slack och dokumenterar + påminner`,n:1},{t:`Eget affärssystem / CV-konverterare som samlar bolagets admin med kopplingar mot B3-system`,n:1}],
+   be:["Access till Enterprise","Kostnad & tokens för versioner","Konsulter som inte får jobba med AI i uppdrag","Brist på hjälp, riktlinjer & inspiration från koncernen","Licenskostnader för AI-verktyg"],
+   ab:["R&B i framkant — kan erbjuda kompetens, utbildning, skills","B3 Now — ev. utveckling av egen B3 Now AI Consultant","CV-konverterare / AI-sekreterare","Vara med & representera i olika forum","Forum för personer på samma tekniska nivå"]},
+  enable:{
+   nu:["R&B följer Anthropic cert-program","B3 Now utbildar oss på Echelon (B3 Now AI Consultant)","R&B Lunch & learn; AI Mandatory (Connect)"],
+   be:["Domänkunskap att koppla AI till uppdrag","Incitament för konsulter att lägga tid utöver uppdrag","Strategiska partnerskap — gå all in, ställ krav på certifieringar","Certifieringsförberedande"],
+   ab:["R&B: Tomas Billborn, Jonathan Wallgren, Arvid Halleby, Daniel Gränse Weström (Commit), Emil Neander (Commit)"]},
+  commit:["Mats — fortsätter hos kund (prototyper/POC); personaliserar AI-sekreteraren","JG — utbilda inom Claude Cowork/Code, bygga skills & plugins (backoffice/overhead/ledare)","Påbörjar Anthropic certifieringsresa","Andreas — Claude-certifieringar; bygger vidare på säljpresentation med Claude som motor","Pontus Thell & Stefan — dela AI-dialoger med kunder & marknad; paketering av tjänster","1 Champion + governance"]}
+];
+
+const THEMES = [
+ {title:"Säker gemensam AI-plattform & licenser", rank:"Tema 1 · Nästan unisont",
+  cls:[1,2,3,4,5,6,8,9,10],
+  desc:"Det enskilt starkaste mönstret. Nästan alla kluster efterfrågar en sanktionerad, koncerngemensam plattform med tydliga licenser och Enterprise-access. Idag en lapptäcke av ChatGPT Team, Copilot och Claude — ofta gratisnivå eller privat.",
+  ex:["”Oklart vilka verktyg vi får internt” (K2)","”Otydligt med policy / vad man får göra” (K4,6,8,9)","”Access till Enterprise · licenskostnader” (K10)"]},
+ {title:"Governance, policy & compliance (GDPR/AI Act)", rank:"Tema 2 · Hög frekvens",
+  cls:[3,4,5,6,8,9],
+  desc:"Flera bolag har redan byggt governance-ramverk (återanvändbart!), men koncernen saknar gemensam policy. Compliance-kompetens, behandlingsriktlinjer, DPO och säkerhets-audit för reglerade kunder återkommer.",
+  ex:["”Gjort Governance-ramverk” — delat av K4,6,8,9","”Säkerhets-audit för GDPR/AI Act — kan enkelt återanvändas” (K5)","”Saknar compliance-kompetens” (K3)"]},
+ {title:"Sälj- & leveransacceleratorer (CV, anbud, RFx)", rank:"Tema 3 · Mest konkret affärsnytta",
+  cls:[1,2,3,4,6,7,8,9,10],
+  desc:"Den tydligaste affärsnyttan: CV-matchning/coach, Salesflow, anbuds- och RFx-generatorer, offert-, case- och referensgeneratorer. Många färdiga artefakter finns redan — paketering och delning saknas.",
+  ex:["Salesflow & CV-coach (K4,9)","Anbudsgenerator (K4,6); RFx Skills (K10)","Case-study & referens-generator (K3,4)"]},
+ {title:"MCP-integrationer mot interna system", rank:"Tema 4 · Teknisk hävstång",
+  cls:[2,4,5,8,9],
+  desc:"Återkommande teknisk byggsten: MCP-kopplingar mot Cinode, Maconomy, Business Central, 365 och Bolags-/AI-kompassen. Hög återanvändningspotential över bolagen om de samlas.",
+  ex:["MCP mot Cinode & Maconomy (K5,9)","Cinode MCP, 365 MCP (K2)","MCP mot Bolagskompassen/AI-kompassen (K4)"]},
+ {title:"Skilling: utbildningsplan & certifieringar", rank:"Tema 5 · Genomgående i Enable",
+  cls:[1,2,3,4,5,6,8,9,10],
+  desc:"”Vilka certifikat/utbildningar ska man göra?” ställs i nästan varje kluster. Efterfrågan på en gemensam kompetenstrappa (”AI-klivet / B3 AI Certified”), roller­specifika spår och AI-labbar.",
+  ex:["”AI-kompetenstrappa 0–5 steg” & ”AI-klivet 2026” (K2)","”Färdiga AI-learning paths för nyanställda” (K9)","Årshjul med utbildningar (K8)"]},
+ {title:"AI Champions, community & kunskapsdelning", rank:"Tema 6 · Bärande mekanism",
+  cls:[1,2,3,4,5,6,8,9,10],
+  desc:"Varje kluster commit:ar ”1 Champion + governance-struktur”. AI Forge/Community finns redan (K4). Show & tell, klusterdelning och tips-kanaler efterfrågas som spridningsmotor.",
+  ex:["”1 Champion + bidra governance-struktur” (alla kluster)","AI Community / AI Forge (K4)","Show & tell, AI talks (K9)"]},
+ {title:"Återanvändbart strukturkapital (skills, prompts)", rank:"Tema 7 · Outnyttjad tillgång",
+  cls:[3,4,7,8,9],
+  desc:"Mycket är byggt men inte paketerat. Promptbibliotek, skills/md-filer, playbooks och transkriberingsagenter ligger spritt. En gemensam delningsyta/marketplace skulle frigöra värde direkt.",
+  ex:["Promptbibliotek + GPT/agent (K8)","Koncerngemensamma skillset & md-filer (K9)","Playbook med AI-stöd-exempel (K3)"]},
+ {title:"AI-agenter & automatisering av processer", rank:"Tema 8 · Mognadsfront",
+  cls:[2,3,4,5,7,10],
+  desc:"De mest avancerade bolagen bygger agenter: ekonomi/forecasting, förhandlingsrobot, transkribering, AI-sekreterare, Copilot-agenter i reglerad miljö. Spetsen att lyfta in i marketplace/AI Factory.",
+  ex:["Ekonomi-agent, forecasting, förhandlingsrobot (K4)","CustomGPT för DORA & ekonomi (K5)","AI-sekreterare (K10); transkriberingsagent (K7)"]},
+ {title:"Hinder: tid, prioritering & mognad", rank:"Tema 9 · Bromsklossar",
+  cls:[1,2,4,5,8,9],
+  desc:"Den mänskliga flaskhalsen: tid att lära, ojämn mognad, ”bara inte så enkelt”, kunskap som fastnar hos individer och ”vi ligger så långt efter”. Måste adresseras parallellt med teknik.",
+  ex:["”Tid! pga projekten” (K2,5,8,9)","”Kunskap fastnar hos individer” (K1)","”Vi ligger så långt efter” (K4)"]},
+ {title:"Pilotbolag & hög bidragsvilja", rank:"Tema 10 · Momentum att ta vara på",
+  cls:[2,3,4,5,6,8,9],
+  desc:"Stark vilja att bidra: flera anmäler sig som pilotbolag för Claude Enterprise, erbjuder utvecklare mellan uppdrag och vill ”vara med i allt”. Energi finns — behöver struktur och riktning.",
+  ex:["”Pilotbolag för Claude Enterprise” (K3,4,6,8,9)","”Vi vill vara med i allt :)” (K3)","Bidra med utvecklare mellan uppdrag (K2)"]}
+];
+
+/* ---------- counts ---------- */
+function countNotes(){
+  let plat=0,enab=0,comm=0;
+  CL.forEach(c=>{
+    ['nu','be','ab','bidr'].forEach(k=>{ if(c.platform[k]) plat+=c.platform[k].length; if(c.enable[k]) enab+=c.enable[k].length; });
+    comm += c.commit.length;
+  });
+  return {plat,enab,comm,total:plat+enab+comm};
+}
+const C = countNotes();
+kPlat.textContent=C.plat; kEnab.textContent=C.enab; kComm.textContent=C.comm; kNotes.textContent=C.total;
+
+/* ---------- render cluster view ---------- */
+const QLAB={nu:"Nuläge — byggt / testat", be:"Behov & smärtor", ab:"Återanvändbart", bidr:"Bidrag"};
+function noteSpan(item){
+  const t = (typeof item==='string')? item : item.t;
+  return `<span class="note" data-t="${t.toLowerCase()}">${t}</span>`;
+}
+function secBlock(cls, secKey, data, label, glyph){
+  let html=`<div class="sec ${cls}" data-sec="${secKey}"><div class="sec-h">${glyph} ${label}</div>`;
+  ['nu','be','ab','bidr'].forEach(k=>{
+    if(!data[k]||!data[k].length) return;
+    html+=`<div class="qgroup"><div class="qlab">${QLAB[k]}</div><div class="notes">`;
+    data[k].forEach(t=> html+=noteSpan(t));
+    html+=`</div></div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+function commitBlock(arr){
+  let html=`<div class="sec c" data-sec="commit"><div class="sec-h">✓ Commitment zone — så hjälper jag till</div><div class="notes">`;
+  arr.forEach(t=> html+=noteSpan(t));
+  html+=`</div></div>`;
+  return html;
+}
+function renderClusters(){
+  let h=`<div class="grid">`;
+  CL.forEach(c=>{
+    h+=`<div class="cl" data-cl="${c.n}">
+      <div class="cl-h" onclick="this.parentNode.classList.toggle('collapsed')">
+        <div style="display:flex;align-items:center"><span class="badge">${c.n}</span><div><h3>Kluster ${c.n}</h3><div class="city">${c.city}</div></div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="cnt"></span><span class="chev">▾</span></div>
+      </div>
+      <div class="cl-body">
+        ${secBlock('p','platform',c.platform,'Platform & Deliver · Spår 1','▦')}
+        ${secBlock('e','enable',c.enable,'Enable · Spår 2 — Skilling + Champions','◇')}
+        ${commitBlock(c.commit)}
+      </div></div>`;
+  });
+  h+=`</div>`;
+  document.getElementById('view-cluster').innerHTML=h;
+  // per-cluster counts
+  document.querySelectorAll('#view-cluster .cl').forEach(el=>{
+    el.querySelector('.cnt').textContent = el.querySelectorAll('.note').length+' lappar';
+  });
+}
+
+/* ---------- render theme view ---------- */
+function renderThemes(){
+  let h=`<div class="themes">`;
+  THEMES.forEach(t=>{
+    let dots='';
+    for(let i=1;i<=10;i++) dots+=`<span class="dot ${t.cls.includes(i)?'on':''}">${i}</span>`;
+    h+=`<div class="th">
+      <div class="rank">${t.rank}</div>
+      <h3>${t.title}</h3>
+      <div class="meta"><span style="font-size:11.5px;color:var(--muted);font-weight:600">Nämnt i ${t.cls.length}/10 kluster:</span><span class="heat">${dots}</span></div>
+      <p>${t.desc}</p>
+      <div class="sub">Exempel från lapparna</div>
+      ${t.ex.map(e=>`<div class="ex">${e}</div>`).join('')}
+    </div>`;
+  });
+  h+=`</div>`;
+  document.getElementById('view-theme').innerHTML=h;
+}
+
+/* ---------- render synthesis ---------- */
+function renderSyn(){
+  const h=`
+  <div class="panel full">
+    <h2>Exekutiv sammanfattning</h2>
+    <p class="lead">Tio kluster, ~${C.total} lappar. Tre tydliga slutsatser för programmet.</p>
+    <div class="ins"><div class="ico">1</div><div><h4>Efterfrågan är samstämmig — det handlar inte om att övertyga, utan om att samordna</h4><p>9 av 10 kluster efterfrågar samma sak: en säker, gemensam plattform med tydliga licenser och policy. Energin och pilotviljan finns redan; det som saknas är central riktning och en sanktionerad väg från ”jag testar själv” till ”vi erbjuder detta som tjänst”.</p></div></div>
+    <div class="ins"><div class="ico t">2</div><div><h4>Mycket är redan byggt — värdet ligger i att paketera och dela, inte bygga om</h4><p>Governance-ramverk, Salesflow, CV-matchning, anbudsgeneratorer, MCP-kopplingar och promptbibliotek finns redan i flera bolag. De ligger spritt och opaketerade. En gemensam marketplace/delningsyta frigör värde omgående.</p></div></div>
+    <div class="ins"><div class="ico b">3</div><div><h4>Kompetensgapet är störst utanför utvecklingsorganisationen</h4><p>Starkast: utvecklare, arkitekter, tekniska ledare. Svagast: sälj, rekrytering, chefer, affärsutveckling. ”Vilka certifikat ska man göra?” ställs överallt. En rollbaserad kompetenstrappa (”AI-klivet / B3 AI Certified”) är den mest efterfrågade Enable-insatsen.</p></div></div>
+  </div>
+
+  <div class="panel">
+    <h2>De fem hetaste backlog-kandidaterna</h2>
+    <p class="lead">Rankat på frekvens × konkret affärsnytta över klustren.</p>
+    <div class="reco"><b>Säker AI-plattform med Enterprise-licenser & tydlig policy</b> — grundbulten 9 kluster väntar på (Spår 1).</div>
+    <div class="reco"><b>Koncerngemensam governance & compliance-pack</b> (GDPR/AI Act) — återanvänd befintliga ramverk från K4/5/6/8/9.</div>
+    <div class="reco"><b>Marketplace för sälj-/leveransacceleratorer</b> — CV-matchning, Salesflow, anbud/RFx, case/referens-generator.</div>
+    <div class="reco"><b>Rollbaserad kompetenstrappa + certifieringsspår</b> — ”AI-klivet” som koncernstandard, AI-labbar varje vecka.</div>
+    <div class="reco"><b>MCP-bibliotek mot interna system</b> — Cinode, Maconomy, BC, 365 samlat och återanvändbart.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Bidrag & momentum</h2>
+    <p class="lead">Det här erbjuder klustren konkret in i programmet.</p>
+    <div class="reco"><b>Pilotbolag för Claude Enterprise:</b> K3, K4, K6, K8, K9 har anmält intresse.</div>
+    <div class="reco"><b>Champions:</b> varje kluster utser minst 1 — bygg ett tvärgående Champion-nätverk + governance-forum direkt.</div>
+    <div class="reco"><b>Spjutspetsbolag:</b> B3 Cloud (AI Forge, brett agentbygge), B3 Zenith, R&B/B3 Now (Echelon AI Consultant) kan leda spår.</div>
+    <div class="reco"><b>Utvecklare mellan uppdrag (K2)</b> kan bemanna PoC/plattformsbygge.</div>
+    <div class="tension"><b>Att hantera:</b> spännvidden i mognad är stor — från ”vi vill vara med i allt :)” (K3) till ”vi ligger så långt efter att vi kanske inte kan bidra” (K4). Sätt en låg tröskel för deltagande så de som ligger efter inte tappas, och låt spjutspetsbolagen dra.</div>
+  </div>`;
+  document.getElementById('view-syn').innerHTML=h;
+}
+
+renderSyn(); renderClusters(); renderThemes();
+
+/* ---------- view switching ---------- */
+document.querySelectorAll('.tabs button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const v=b.dataset.view;
+    document.getElementById('view-syn').classList.toggle('hidden',v!=='syn');
+    document.getElementById('view-cluster').classList.toggle('hidden',v!=='cluster');
+    document.getElementById('view-theme').classList.toggle('hidden',v!=='theme');
+    const showFilter = (v==='cluster');
+    document.getElementById('secfilter').style.visibility = showFilter?'visible':'hidden';
+  };
+});
+
+/* ---------- section filter (cluster view) ---------- */
+const secState={platform:true,enable:true,commit:true};
+document.querySelectorAll('.chipf').forEach(ch=>{
+  ch.onclick=()=>{
+    const s=ch.dataset.sec; secState[s]=!secState[s];
+    ch.classList.toggle('on',secState[s]);
+    document.querySelectorAll(`#view-cluster .sec[data-sec="${s}"]`).forEach(el=>el.style.display=secState[s]?'':'none');
+  };
+});
+
+/* ---------- search ---------- */
+document.getElementById('q').addEventListener('input',e=>{
+  const term=e.target.value.trim().toLowerCase();
+  // auto-switch to cluster view when searching
+  if(term && !document.querySelector('.tabs button[data-view="cluster"]').classList.contains('active')){
+    document.querySelector('.tabs button[data-view="cluster"]').click();
+  }
+  const notes=document.querySelectorAll('#view-cluster .note');
+  notes.forEach(n=>{
+    const hit = term && n.dataset.t.includes(term);
+    n.classList.toggle('hit',hit);
+    if(term){ n.style.display = n.dataset.t.includes(term)?'':'none'; }
+    else { n.style.display=''; }
+  });
+  // collapse clusters with no hits, expand those with hits
+  document.querySelectorAll('#view-cluster .cl').forEach(cl=>{
+    if(!term){ return; }
+    const has=[...cl.querySelectorAll('.note')].some(n=>n.dataset.t.includes(term));
+    cl.classList.toggle('collapsed',!has);
+  });
+});
+document.getElementById('secfilter').style.visibility='hidden';
+</script>
+</body>
+</html>
